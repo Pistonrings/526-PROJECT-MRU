@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Posts</title>
+</head>
+<body>
+    <h1>Social Media Posts</h1>
+    <form id="postForm">
+        <input type="text" id="title" placeholder="Title" required>
+        <textarea id="content" placeholder="Content" required></textarea>
+        <button type="submit">Create Post</button>
+    </form>
+    <h2>All Posts:</h2>
+    <div id="posts"></div>
+
+    <script>
+        document.getElementById("postForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+            const title = document.getElementById("title").value;
+            const content = document.getElementById("content").value;
+
+            const res = await fetch("/api/posts", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title, content }),
+            });
+
+            if (res.ok) {
+                loadPosts();
+            }
+        });
+
+        async function loadPosts() {
+            const res = await fetch("/api/posts");
+            const posts = await res.json();
+            document.getElementById("posts").innerHTML = posts
+                .map((post) => `<p><strong>${post.title}</strong>: ${post.content}</p>`)
+                .join("");
+        }
+
+        loadPosts();
+    </script>
+</body>
+</html>
